@@ -57,24 +57,6 @@ public class ModuleWithGlobalElementTestCase extends AbstractIntegrationTestCase
     return "module/flows-using-module-global-elements.xml";
   }
 
-  //@Override
-  //protected Class<?>[] getAnnotatedExtensionClasses() {
-  //  //TODO until MULE-10383 is fixed both Socket and Http extensions will be exposed, instead of just the Http one
-  //  return new Class[] {SocketsExtension.class, HttpConnector.class};
-  //}
-  //
-  ///**
-  // * The test cannot run with isolation due to http ext doesn't have anymore the mule-module.properties. This test needs to have
-  // * the complete access to all the classes and resources therefore it just returns the class loader that loaded the test class.
-  // * (taken from AbstractTlsRestrictedProtocolsAndCiphersTestCase test)
-  // *
-  // * @return the {@link ClassLoader} that loaded the test.
-  // */
-  //@Override
-  //protected ClassLoader getExecutionClassLoader() {
-  //  return this.getClass().getClassLoader();
-  //}
-
   @Test
   public void testHttpDoLogin() throws Exception {
     Event muleEvent = flowRunner("testHttpDoLogin").run();

@@ -118,7 +118,7 @@ public class ModuleExtensionStore {
 
   private Document getModuleDocument(XmlConfigurationDocumentLoader xmlConfigurationDocumentLoader, Resource resource) {
     try {
-      return xmlConfigurationDocumentLoader.loadDocument(of(this), resource.getInputStream());
+      return xmlConfigurationDocumentLoader.loadDocument(empty(), resource.getInputStream());
     } catch (IOException e) {
       throw new MuleRuntimeException(
                                      createStaticMessage(format("There was an issue reading the stream for the resource %s",

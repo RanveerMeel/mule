@@ -191,6 +191,10 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
                  getResourceFile("/org/foo/hello/HelloOperation.java"))
       .compile("mule-module-hello-4.0-SNAPSHOT.jar", "1.0");
 
+  //private static final ArtifactPluginFileBuilder byeXmlExtensionPlugin = new ArtifactPluginFileBuilder("bye-extension")
+  //  .containingResource("module-byeSource.xml", "classes/module-bye.xml");
+  //.containingResource("module-byeSource.xml", "classes/module-bye.xml")
+
   private static final File echoTestClassFile = new SingleClassCompiler()
       .compile(getResourceFile("/org/foo/EchoTest.java"));
 
@@ -1513,6 +1517,47 @@ public class DeploymentServiceTestCase extends AbstractMuleTestCase {
                             "/, META-INF/mule-hello.xsd, META-INF/spring.handlers, META-INF/spring.schemas");
     ApplicationFileBuilder applicationFileBuilder = new ApplicationFileBuilder("appWithExtensionPlugin")
         .definedBy("app-with-extension-plugin-config.xml").containingPlugin(extensionPlugin);
+    addPackedAppFromBuilder(applicationFileBuilder);
+
+    startDeployment();
+
+    assertDeploymentSuccess(applicationDeploymentListener, applicationFileBuilder.getId());
+  }
+
+  @org.junit.Rule
+  public org.junit.rules.Timeout globalTimeout = new org.junit.rules.Timeout(3000000);
+
+  // TODO(fernandezlautaro): MULE-10866 test that generates an extension
+  @Test
+  public void deploysAppZipWithExtensionXmlPlugin() throws Exception {
+    final ServiceFileBuilder echoService =
+        new ServiceFileBuilder("echoService").configuredWith(SERVICE_PROVIDER_CLASS_NAME, "org.mule.echo.EchoServiceProvider")
+            .usingLibrary(defaulServiceEchoJarFile.getAbsolutePath());
+    File installedService = new File(services, echoService.getArtifactFile().getName());
+    copyFile(echoService.getArtifactFile(), installedService);
+
+    final ServiceFileBuilder fooService = new ServiceFileBuilder("fooService")
+        .configuredWith(SERVICE_PROVIDER_CLASS_NAME, "org.mule.service.foo.FooServiceProvider")
+        .usingLibrary(defaultFooServiceJarFile.getAbsolutePath());
+    installedService = new File(services, fooService.getArtifactFile().getName());
+    copyFile(fooService.getArtifactFile(), installedService);
+
+    //ArtifactPluginFileBuilder extensionPlugin =
+    //    new ArtifactPluginFileBuilder("extensionPlugin").usingLibrary(helloExtensionJarFile.getAbsolutePath())
+    //        .configuredWith(EXPORTED_RESOURCE_PROPERTY,
+    //                        "/, META-INF/mule-hello.xsd, META-INF/spring.handlers, META-INF/spring.schemas");
+
+
+    String moduleFileName = "module-bye.xml";
+    final ArtifactPluginFileBuilder byeXmlExtensionPlugin = new ArtifactPluginFileBuilder("bye-extension")
+        .containingResource("module-byeSource.xml", moduleFileName)
+        .configuredWith(EXPORTED_RESOURCE_PROPERTY,
+                        "/, classes")
+        .configuredWith("xml.location", moduleFileName);
+
+
+    ApplicationFileBuilder applicationFileBuilder = new ApplicationFileBuilder("appWithExtensionXmlPlugin")
+        .definedBy("app-with-extension-xml-plugin-config.xml").containingPlugin(byeXmlExtensionPlugin);
     addPackedAppFromBuilder(applicationFileBuilder);
 
     startDeployment();
